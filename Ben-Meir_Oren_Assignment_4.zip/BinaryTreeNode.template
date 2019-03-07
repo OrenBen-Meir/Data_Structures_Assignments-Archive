@@ -1,0 +1,105 @@
+#include <iostream>
+#include <assert.h>
+template<typename Item>
+void binary_tree_remove_root(BinaryTreeNode<Item>*& root_ptr){
+    if(root_ptr==NULL) return;
+    else if(root_ptr->right_link()==NULL){
+        BinaryTreeNode<Item>*& old_root=root_ptr;
+        root_ptr=root_ptr->left_link();
+        delete old_root;
+    }
+    else{
+        BinaryTreeNode<Item>*& prev=root_ptr();
+        BinaryTreeNode<Item>*& current=root_ptr->right_link();
+        while(current->left_link()!=NULL){
+            if(prev==root_ptr)prev=current;
+            else prev=prev->left();
+            current=current->left();
+        }
+        root_ptr->set_key(current->key());
+        root_ptr->set_data(current->data());
+        if(current->right_link()==NULL) delete current;
+        else{
+            prev->set_left_link(current->right_link());
+            delete current;
+        }
+    }
+}
+
+template<typename Item>
+void binary_tree_remove_by_key(BinaryTreeNode<Item>*& root_ptr, unsigned int key_entry){
+    BinaryTreeNode<Item>*& current=root_ptr;
+    while(current!=NULL){
+        if(current->key()==key_entry){
+            binary_tree_remove_root(current);
+            return;
+        }
+        else if(key_entry>current->key())current=current->right_link();
+        else current=current->left_link();
+    }
+}
+
+template<typename Item>
+void binary_tree_remove_all(BinaryTreeNode<Item>*& root_ptr){
+    if(root_ptr!=NULL){
+        binary_treeerase_all(root_ptr->left_link());
+        binary_tree_erase_all(root_ptr->right_link());
+        delete root_ptr;
+        root_ptr=NULL;
+    }
+}
+template<typename Item>
+void binary_tree_insert(BinaryTreeNode<Item>*& root_ptr,unsigned int key_entry, Item data_entry=Item()){
+    BinaryTreeNode<Item>*& current=root_ptr;
+    while(current!=NULL){
+        if(current->key()==key_entry){
+            current->set_data(data_entry);
+            return;
+        }
+        if(current->key()>key_entry){
+            if(current->left_link()==NULL){
+                current->set_left_link(new BinaryTreeNode<Item>(key_entry,data_entry));
+                return;
+            }
+            current=current->left_link();
+        }
+        else{
+            if(current->right_link()==NULL){
+                current->set_right_link(new BinaryTreeNode<Item>(key_entry,data_entry));
+                return;
+            }
+            current=current->right_link();
+        }
+    }
+}
+template<typename Item>
+bool binary_tree_search_key(const BinaryTreeNode<Item>*& root_ptr,unsigned int key_entry){
+    if(root_ptr==NULL) return false;
+    if(root_ptr->key()==key_entry) return true;
+    if(root_ptr->key()<key_entry) binary_tree_search_key(root_ptr->right_link(),key_entry);
+    else binary_tree_search_key(root_ptr->left_link(),key_entry);
+}
+template<typename Item>
+void binary_tree_access_data_by_key(const BinaryTreeNode<Item>*& root_ptr,unsigned int key_entry){
+    assert(root_ptr!=NULL);
+    if(root_ptr->key()==key_entry) return root_ptr->data();
+    if(root_ptr->key()<key_entry) binary_tree_access_data_by_key(root_ptr->right_link(),key_entry);
+    else binary_tree_access_data_by_key(root_ptr->left_link(),key_entry);
+}
+
+template<typename Item>
+Item binary_tree_access_key_by_root(const BinaryTreeNode<Item>*& root_ptr){
+    assert(root_ptr!=NULL);
+    return root_ptr->key();
+}
+
+template<typename Item>
+Item binary_tree_access_data_by_root(const BinaryTreeNode<Item>*& root_ptr){
+    assert(root_ptr!=NULL);
+    return root_ptr->data();
+}
+
+template<typename Item>
+Item binary_tree_if_filled(const BinaryTreeNode<Item>*& root_ptr){
+    return !(root_ptr=NULL);
+}

@@ -1,0 +1,57 @@
+#include "HashBucket.h"
+
+template<typename Item>
+HashTable<Item>::HashTable(unsigned int new_capacity){
+    capacity=new_capacity;
+    threshold=capacity*40;
+    used=0;
+    table= new HashBucket<Item>[capacity];
+}
+template<typename Item>
+HashTable<Item>::~HashTable(){
+    erase_all();
+    delete[] table;
+}
+template<typename Item>
+void HashTable<Item>::insert(unsigned int key_entry,Item data_entry){
+    unsigned int old_size= table[key_entry%capacity].size();
+    table[key_entry%capacity].insert(key_entry,data_entry);
+    used=used+table[key_entry%capacity].size()-old_size;
+    if(used>threshold) rehash();
+}
+template<typename Item>
+void HashTable<Item>::erase(unsigned int key_entry){
+    unsigned int old_size= table[key_entry%capacity].size();
+    table[key_entry%capacity].erase(key_entry);
+    used=used+table[key_entry%capacity].size()-old_size;
+}
+template<typename Item>
+void HashTable<Item>::erase_all(){
+    used=0;
+    for(unsigned int i=0;i<capacity;i++) table[i].erase_all();
+    delete[] table;
+    capacity=DEFAULT_CAPACITY;
+    table= new HashBucket<Item>[capacity];
+    threshold=capacity*40;
+}
+template<typename Item>
+bool HashTable<Item>::search(unsigned int key_entry){return table[key_entry%capacity].search(key_entry);}
+template<typename Item>
+Item HashTable<Item>::access(unsigned int key_entry) const{return table[key_entry%capacity].access(key_entry);}
+template<typename Item>
+unsigned int HashTable<Item>::size() const{return used;}
+template<typename Item>
+void HashTable<Item>::rehash(){
+    unsigned int new_capacity=4*capacity;
+    HashBucket<Item>* new_table=new HashBucket<Item>[new_capacity];
+    for(unsigned int i=0;i<capacity;i++){
+        for(unsigned int j=0;j<table[i].size();i++){
+            new_table[table[i].top_key()%capacity].insert(table[i].top_key(),table[i].top_data());
+        }
+        table[i].erase_all();
+    }
+    capacity=new_capacity;
+    threshold=capacity*40;
+    delete[] table;
+    table=new_table;
+}

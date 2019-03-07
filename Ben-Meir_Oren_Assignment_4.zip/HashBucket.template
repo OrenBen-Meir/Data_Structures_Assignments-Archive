@@ -1,0 +1,111 @@
+#include "LinkedListNode.h"
+#include "BinaryTreeNode.h"
+#include <iostream>
+
+template<typename Item>
+HashBucket<Item>::HashBucket(){
+    head_ptr=NULL;
+    root_ptr=NULL;
+    used=0;
+}
+template<typename Item>
+HashBucket<Item>::~HashBucket(){
+    erase_all();
+}
+template<typename Item>
+void HashBucket<Item>::insert(unsigned int new_key, Item new_data){
+    if(root_ptr==NULL){
+        if(!linked_list_search_key(head_ptr,new_key)) used++;
+        linked_list_insert(head_ptr,new_key,new_data);
+        if(used>=LINKED_LIST_THREASHOLD) convert_link_to_binary();
+    }
+    else{
+        if(!binary_tree_search_key(root_ptr,new_key)) used++;
+        binary_tree_insert(root_ptr, new_key, new_data);
+    }
+}
+template<typename Item>
+void HashBucket<Item>::erase(unsigned int key_entry){
+    if(search(key_entry)) used--;
+    if(root_ptr==NULL){
+        linked_list_remove_by_key(head_ptr,key_entry);
+    }
+    else{
+        binary_tree_remove_by_key(root_ptr,key_entry);
+        if(used<=BINARY_TREE_THREASHOLD) convert_binary_to_link();
+    }
+}
+template<typename Item>
+void HashBucket<Item>::erase_top(){
+    if(root_ptr==NULL){
+        linked_list_remove_head(head_ptr);
+    }
+    else{
+        binary_tree_remove_root(root_ptr);
+    }
+    if(used>0) used--;
+}
+template<typename Item>
+void HashBucket<Item>::erase_all(){
+    if(root_ptr==NULL){
+        linked_list_remove_all(head_ptr);
+    }
+    else{
+        binary_tree_remove_all(root_ptr);
+    }
+    used=0;
+}
+template<typename Item>
+bool HashBucket<Item>::search(unsigned int key_entry){
+    if(root_ptr==NULL){
+        return linked_list_search_key(head_ptr,key_entry);
+    }
+    else{
+        return binary_tree_search_key(root_ptr,key_entry);
+    }
+}
+template<typename Item>
+Item HashBucket<Item>::access(unsigned int key_entry) const{
+    if(root_ptr==NULL){
+        return linked_list_access_data_by_key(head_ptr,key_entry);
+    }
+    else{
+        return binary_tree_access_data_by_key(root_ptr,key_entry);
+    }
+}
+template<typename Item>
+Item HashBucket<Item>::top_data() const{
+    if(root_ptr==NULL){
+        return linked_list_access_data_by_head(head_ptr);
+    }
+    else{
+        return binary_tree_access_data_by_root(root_ptr);
+    }
+}
+template<typename Item>
+unsigned int HashBucket<Item>::top_key() const{
+    if(root_ptr==NULL){
+        return linked_list_access_key_by_head(head_ptr);
+    }
+    else{
+        return binary_tree_access_key_by_root(root_ptr);
+    }
+}
+template<typename Item>
+bool HashBucket<Item>::if_filled() const{return (root_ptr!=NULL||head_ptr!=NULL);}
+template<typename Item>
+unsigned int HashBucket<Item>::size() const{return used;}
+template<typename Item>
+void HashBucket<Item>::convert_link_to_binary(){
+    while(head_ptr!=NULL){
+        binary_tree_insert(root_ptr,linked_list_access_key_by_head(head_ptr),linked_list_access_data_by_head(head_ptr));
+        linked_list_remove_head(head_ptr);
+    }
+}
+template<typename Item>
+void HashBucket<Item>::convert_binary_to_link(){
+    while(root_ptr!=NULL){
+        linked_list_insert(head_ptr,binary_tree_access_key_by_root(root_ptr),binary_tree_access_data_by_root(root_ptr));
+        binary_tree_remove_root(root_ptr);
+    }
+}

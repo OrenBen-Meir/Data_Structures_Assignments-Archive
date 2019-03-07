@@ -1,0 +1,102 @@
+#include <assert.h>
+#include <iostream>
+template<typename Item>
+void linked_list_remove_by_key(LinkedListNode<Item>*& head_ptr,const unsigned int& key_entry){
+    if(head_ptr==NULL) return;
+    if(head_ptr->key()==key_entry){
+        LinkedListNode<Item>* old_head_ptr=head_ptr;
+        head_ptr=head_ptr->link();
+        delete old_head_ptr;
+    }
+    LinkedListNode<Item>* prev=head_ptr;
+    while(prev->link()!=NULL){
+        if(prev->link()->key()==key_entry){
+            LinkedListNode<Item>* old_node=prev->link();
+            prev->set_link(prev->link()->link());
+            delete old_node;
+            return;
+        }
+        prev=prev->link();
+    }
+}
+
+template<typename Item>
+void linked_list_remove_head(LinkedListNode<Item>*& head_ptr){
+    if(head_ptr!=NULL){
+        LinkedListNode<Item>* old_head_ptr=head_ptr;
+        head_ptr=head_ptr->link();
+        delete old_head_ptr;
+    }
+}
+
+template<typename Item>
+void linked_list_insert(LinkedListNode<Item>*& head_ptr, const unsigned int& key_entry,const Item& data_entry=Item()){
+    if(head_ptr==NULL){
+        head_ptr = new LinkedListNode<Item>*(key_entry,data_entry,head_ptr);
+        return;
+    }
+    LinkedListNode<Item>*& current=head_ptr;
+    while(current->link()!=NULL){
+        if(key_entry==current->key()){
+            current->set_data(data_entry);
+            return;
+        }
+        current=current->link();
+    }
+    if(key_entry==current->key()) current->set_data(data_entry);
+    else current->set_link(new LinkedListNode<Item>*(key_entry,data_entry));
+
+}
+
+template<typename Item>
+bool linked_list_search_key(const LinkedListNode<Item>*& head_ptr, const unsigned int& key_entry){
+    LinkedListNode<Item>* current=head_ptr;
+    while(current!=NULL){
+        if(current->key()==key_entry) return true;
+        current=current->link();
+    }
+    return false;
+}
+
+//precondition: key exists
+template<typename Item>
+Item linked_list_access_data_by_key(const LinkedListNode<Item>*& head_ptr, const unsigned int& key_entry){
+    LinkedListNode<Item>* current=head_ptr;
+    while(current!=NULL){
+        if(current->key()==key_entry) return current->data();
+        current=current->link();
+    }
+    assert(current!=NULL);
+}
+
+//precondition: nonempty linked list
+template<typename Item>
+Item linked_list_access_key_by_head(const LinkedListNode<Item>*& head_ptr){
+    assert(head_ptr!=NULL);
+    return head_ptr->key();
+}
+
+//precondition: nonempty linked list
+template<typename Item>
+Item linked_list_access_data_by_head(const LinkedListNode<Item>*& head_ptr){
+    assert(head_ptr!=NULL);
+    return head_ptr->data();
+}
+
+template<typename Item>
+Item linked_list_remove_all(LinkedListNode<Item>*& head_ptr){
+    if(head_ptr==NULL) return;
+    else{
+        LinkedListNode<Item>* current=head_ptr;
+        while(current!=NULL){
+            LinkedListNode<Item>* prev=current;
+            current=current->link();
+            delete prev;;
+        }
+    }
+}
+
+template<typename Item>
+Item linked_list_if_filled(const LinkedListNode<Item>*& head_ptr){
+    return !(head_ptr=NULL);
+}
